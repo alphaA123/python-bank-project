@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 venv/
 .env
+
+
+# git remote add origin https://github.com/alphaA123/python-bank-project.git
+# git branch -M main
+# git push -u origin main

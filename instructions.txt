@@ -1,0 +1,307 @@
+Here is a step-by-step guide focusing on Git and GitHub for automation.
+
+🚀 Part 1: Initial Git Setup and Push to GitHub
+Step 1: Initialize Git in Your Project Folder
+Open your terminal or command prompt.
+
+Navigate to your project's main folder (Python in this case) where mybank.py is located.
+
+Bash
+
+cd path/to/Python
+Initialize a new Git repository:
+
+Bash
+
+git init
+Step 2: Create a .gitignore File (Optional but Recommended)
+A .gitignore file tells Git to ignore files you don't want to track (like temporary files, virtual environment folders, etc.).
+
+Create a file named .gitignore in the Python folder.
+
+Add common Python files/folders to it (e.g., if you use a virtual environment):
+
+# .gitignore content
+__pycache__/
+*.pyc
+venv/
+.env
+Step 3: Stage and Commit Your Code
+Stage all the files (including mybank.py and .gitignore):
+
+Bash
+
+git add .
+Commit the changes (this is the first historical snapshot):
+
+Bash
+
+git commit -m "Initial commit of the BankAccount class"
+Step 4: Create a Repository on GitHub and Push
+Go to GitHub and log in.
+
+Click the + icon (top right) and select New repository.
+
+Give it a name (e.g., python-bank-project). Do NOT check the box to initialize with a README.
+
+After creation, GitHub will show you commands under "push an existing repository from the command line." Use those commands:
+
+Bash
+
+# Replace <your-username> and <repository-name> with your actual details
+git remote add origin https://github.com/<your-username>/python-bank-project.git
+git branch -M main
+git push -u origin main
+Your mybank.py file is now on GitHub!
+
+🤖 Part 2: Automate Changes with GitHub Actions (CI/CD)
+To "automate changes" (usually meaning automatically test your code when you push a change, or deploy it), you'll use GitHub Actions. This requires a workflow file in a specific folder.
+
+Step 5: Create the Workflow Folder and File
+Create a new folder named .github in your main Python directory.
+
+Inside .github, create another folder named workflows.
+
+Inside workflows, create a file named ci_test.yml.
+
+Your directory structure should look like this:
+
+Python/
+├── .github/
+│   └── workflows/
+│       └── ci_test.yml
+├── mybank.py
+└── .gitignore
+Step 6: Define the Automation Workflow
+Paste the following YAML code into your ci_test.yml file. This workflow will automatically run a test every time you push code to the main branch.
+
+YAML
+
+# .github/workflows/ci_test.yml
+
+name: Python CI Pipeline
+
+# Trigger this workflow on every push to the 'main' branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      # This action checks out your code from the repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      # Sets up the Python environment (using version 3.11 as an example)
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Run a basic test (Replace this with actual unit tests)
+      # This step executes a Python script. For simplicity, we just run the file.
+      # In a real project, you would install dependencies and run pytest here.
+      run: |
+        echo "Running basic sanity check on mybank.py..."
+        python mybank.py
+        # You'd typically run: pip install pytest && pytest
+        
+    - name: Check file existence
+      run: ls -l
+Note: Since you didn't provide any tests, the Run a basic test step simply executes mybank.py. In a real-world scenario, you would install testing libraries (like pytest) and run actual unit tests in this step to ensure your changes didn't break anything.
+
+Step 7: Commit and Push the Workflow
+Stage the new files:
+
+Bash
+
+git add .github/workflows/ci_test.yml
+Commit the changes:
+
+Bash
+
+git commit -m "Add GitHub Actions CI workflow for testing"
+Push the changes to GitHub:
+
+Bash
+
+git push origin main
+Step 8: View the Automation in Action
+Go to your repository on GitHub.
+
+Click the Actions tab.
+
+You will see a new workflow run triggered by your last commit. Click on it to see the steps execute (Checkout, Setup Python, Run basic test).
+
+Now, every time you make a change to mybank.py and push it to the main branch, the GitHub Action will automatically run the test to "automate" the check that your changes work.
+
+//////////////////////////////////////////////////////////////////////////////////
+
+Implementing unit tests is the best way to "automate changes" because it ensures your code still works correctly after every modification. We'll use the standard Python unittest module.
+
+Here are the steps to add a simple unit test for your BankAccount class and integrate it into your GitHub Actions workflow.
+
+🧪 Step 1: Create the Test File
+Create a new file named test_mybank.py in the same directory as your mybank.py file.
+
+Add the following code to test_mybank.py:
+
+Python
+
+# test_mybank.py
+
+import unittest
+# Import the class you want to test from your main file
+from mybank import BankAccount 
+
+class TestBankAccount(unittest.TestCase):
+
+    def test_initial_balance(self):
+        # Test 1: Check if the default balance is set correctly
+        account = BankAccount(account_id='T001')
+        self.assertEqual(account.get_balance(), 1000)
+
+    def test_deposit_positive(self):
+        # Test 2: Check a successful positive deposit
+        account = BankAccount(account_id='T002', balance=500)
+        account.deposit(250)
+        self.assertEqual(account.get_balance(), 750)
+
+    def test_deposit_zero_or_negative(self):
+        # Test 3: Check that a negative or zero deposit doesn't change the balance
+        account = BankAccount(account_id='T003', balance=1000)
+        
+        # Attempt to deposit 0
+        account.deposit(0)
+        self.assertEqual(account.get_balance(), 1000)
+        
+        # Attempt to deposit a negative number
+        account.deposit(-50)
+        self.assertEqual(account.get_balance(), 1000)
+
+# This allows the tests to be run directly when the file is executed
+if __name__ == '__main__':
+    unittest.main()
+⚙️ Step 2: Update the GitHub Actions Workflow
+Now, we need to modify the ci_test.yml file you created in the .github/workflows directory to run this new test file instead of just running mybank.py.
+
+Update the run step in your .github/workflows/ci_test.yml file to the following:
+
+YAML
+
+# ... (rest of the file remains the same)
+
+    - name: Run Unit Tests
+      # This step executes the unittest module to discover and run all tests
+      run: |
+        echo "Running unit tests using unittest..."
+        python -m unittest test_mybank.py
+
+# ... (rest of the file remains the same)
+The crucial line is python -m unittest test_mybank.py. This executes Python's built-in testing framework and runs the tests you defined. If any test fails, the GitHub Action will stop and mark the commit as failed.
+
+⬆️ Step 3: Commit and Push the Changes
+Stage your new test file and the updated workflow file:
+
+Bash
+
+git add test_mybank.py .github/workflows/ci_test.yml
+Commit the changes:
+
+Bash
+
+git commit -m "Add unit tests and update CI to run tests"
+Push the changes to GitHub:
+
+Bash
+
+git push origin main
+When you push, GitHub Actions will automatically trigger, and the Run Unit Tests step will execute test_mybank.py. 
+If all three tests pass, the check mark will be green, confirming your latest code changes are safe!
+
+////////////////////////PACKAGE and run it in a Docker container/////////////////////////////////
+
+Mandatory step : Make sure Docker service is running on your host System
+Tip : Install Docker desktop for seamless setup 
+
+📦 Step 1: Create a Dockerfile
+A Dockerfile is a script that contains instructions for building a Docker image. Create a new file named Dockerfile (no extension) in your main project directory (Python/).
+
+Dockerfile
+
+# Dockerfile
+
+# 1. Base Image: Start from an official lightweight Python image
+# We choose a version that matches your environment, e.g., Python 3.11 slim
+FROM python:3.11-slim
+
+# 2. Set Working Directory: Define the directory inside the container
+WORKDIR /app
+
+# 3. Copy Code: Copy your entire project directory into the container's /app folder
+# The .github folder for CI/CD can be ignored if desired, but including code files is necessary.
+COPY mybank.py /app/
+COPY test_mybank.py /app/
+
+# 4. Command to Run: Define the default command to execute when the container starts
+# We can set it to run your unit tests as a default action to verify the container works.
+CMD ["python", "-m", "unittest", "test_mybank.py"]
+🛠️ Step 2: Build the Docker Image
+Open your terminal and navigate to the directory containing the Dockerfile, mybank.py, and test_mybank.py.
+
+Run the following command to build the image. This command reads the Dockerfile and creates a runnable image.
+
+docker build: The command to build an image.
+
+-t mybank-app:latest: Tags (names) the image as mybank-app with the version latest.
+
+.: Specifies the build context (the current directory, which contains your files).
+
+Bash
+
+docker build -t mybank-app:latest .
+You will see the output of each step defined in your Dockerfile being executed.
+
+🏃 Step 3: Run the Docker Container
+Once the image is built, you can run a container based on it. Since your CMD instruction runs the unit tests, executing the container will run those tests and display the result.
+
+Run the container:
+
+Bash
+
+docker run mybank-app:latest
+Expected Output:
+
+If your tests pass, you should see output similar to this, confirming your application is packaged and running correctly within the container environment:
+
+...
+.
+----------------------------------------------------------------------
+Ran 3 tests in 0.00x s
+
+OK
+🌐 Next Step: Running an Interactive Session
+If you want to run the container and then interact with the code (for example, to launch a Python interpreter and manually check balances), you can override the default CMD using the interactive flag:
+
+Bash
+
+docker run -it mybank-app:latest /bin/bash
+This command will:
+
+-it: Run in interactive mode with a terminal.
+
+/bin/bash: Execute the bash shell.
+
+Once inside the container, you can run your files manually:
+
+Bash
+
+# Inside the container:
+python mybank.py
+# or
+python -i mybank.py  # to open an interactive session with the class loaded

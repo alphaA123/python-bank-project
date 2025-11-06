@@ -1,0 +1,36 @@
+# .github/workflows/ci_test.yml
+
+name: Python CI Pipeline
+
+# Trigger this workflow on every push to the 'main' branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      # This action checks out your code from the repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      # Sets up the Python environment (using version 3.11 as an example)
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Run a basic test (Replace this with actual unit tests)
+      # This step executes a Python script. For simplicity, we just run the file.
+      # In a real project, you would install dependencies and run pytest here.
+      run: |
+        echo "Running basic sanity check on mybank.py..."
+        python mybank.py
+        # You'd typically run: pip install pytest && pytest
+        
+    - name: Check file existence
+      run: ls -l

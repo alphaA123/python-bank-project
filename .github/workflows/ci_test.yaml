@@ -28,8 +28,8 @@ jobs:
       # This step executes a Python script. For simplicity, we just run the file.
       # In a real project, you would install dependencies and run pytest here.
       run: |
-        echo "Running basic sanity check on mybank.py..."
-        python mybank.py
+        echo "Running unit tests using unittest..."
+        python -m unittest test_mybank.py
         # You'd typically run: pip install pytest && pytest
         
     - name: Check file existence

@@ -19,9 +19,9 @@ spec:
       containers:
       - name: bank-container
         # Use the image you just built
-        image: mybank-app:v1 
+        image: alphaabhi68079/mybank-app:v1 
         # Crucial for Minikube: tells K8s not to pull the image from Docker Hub
-        imagePullPolicy: Never 
+        imagePullPolicy: Always 
         # If your app had a web interface, you'd specify a port here
         # ports:
         # - containerPort: 8080

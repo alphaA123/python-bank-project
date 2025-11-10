@@ -14,6 +14,12 @@ COPY test_mybank.py /app/
 COPY .github /app/
 COPY .gitignore /app/
 
-# 4. Command to Run: Define the default command to execute when the container starts
-# We can set it to run your unit tests as a default action to verify the container works.
-CMD ["python", "-m", "unittest", "test_mybank.py"]
+# Normal Scnario
+# # 4. Command to Run: Define the default command to execute when the container starts
+# # We can set it to run your unit tests as a default action to verify the container works.
+# CMD ["python", "-m", "unittest", "test_mybank.py"]
+
+# For kubernetes deployment
+# 4. Command to Run: Run tests on startup, then execute an infinite loop
+# This is a common pattern to keep utility/testing containers alive
+CMD ["/bin/sh", "-c", "python -m unittest test_mybank.py && sleep infinity"]

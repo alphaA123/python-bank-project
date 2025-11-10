@@ -1,0 +1,15 @@
+# bank-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mybank-service
+spec:
+  # The selector links this Service to the Pods created by the Deployment
+  selector:
+    app: bank-app
+  # Type NodePort exposes the service on a port accessible from outside the cluster
+  type: NodePort 
+  ports:
+    - protocol: TCP
+      port: 80 # The port the service runs on internally
+      targetPort: 8080 # The port the container would listen on (if it were a web app)
